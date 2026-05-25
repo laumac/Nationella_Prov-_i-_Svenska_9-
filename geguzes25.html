@@ -1,0 +1,890 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Svenska Nationella Prov Åk 9</title>
+    <meta name="google" content="notranslate">
+    
+    <style>
+        :root { 
+            --primary: #27ae60; 
+            --bg: #f4f7f6; 
+            --text: #2c3e50; 
+            --accent: #2980b9; 
+            --gray-bg: #f8f9fa; 
+            --muted-gray: #34495e;
+            
+            --btn-theme-color: #1e3a8a; 
+            --btn-gen-color: #27ae60;
+            --btn-tips-color: #f39c12;
+            --btn-pdf-color: #e74c3c;
+            --btn-info-color: #2980b9;
+        }
+
+        html, body {
+            height: 100%;
+            margin: 0;
+        }
+
+        body { 
+            font-family: 'Segoe UI', sans-serif; 
+            max-width: 1000px; 
+            margin: 0 auto; 
+            padding: 10px; 
+            background: var(--bg); 
+            color: var(--text); 
+            font-size: 14px; 
+            display: flex; 
+            flex-direction: column; 
+            box-sizing: border-box; 
+            -webkit-user-select: none;
+            user-select: none;
+        }
+        
+        textarea, input {
+            -webkit-user-select: text;
+            user-select: text;
+        }
+        
+        .header { 
+            padding: 0; 
+            margin-bottom: 10px; 
+            background: transparent !important;
+            border: none !important;
+            box-shadow: none !important;
+        }
+        
+        .control-bar { 
+            background: transparent !important; 
+            padding: 4px 0; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            font-size: 12px; 
+            font-weight: 600; 
+            color: var(--muted-gray); 
+            gap: 15px;
+            margin-bottom: 8px; 
+            border-bottom: none !important;
+        }
+
+        #todayDate { text-align: left; white-space: nowrap; }
+        #importantDatesDisplay { flex: 1; text-align: center; font-size: 11px; color: #475569; }
+        #sessionTimer { text-align: right; white-space: nowrap; }
+
+        .header-main-box {
+            background-color: #ffffff !important;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='60' viewBox='0 0 160 60'%3E%3Ctext x='10' y='20' fill='%23f1f5f9' font-family='Arial, sans-serif' font-size='9' font-weight='bold' transform='rotate(-15 10 20)'%3ESVENSKA NP 9%3C/text%3E%3Ctext x='90' y='50' fill='%23f1f5f9' font-family='Arial, sans-serif' font-size='9' font-weight='bold' transform='rotate(-15 90 50)'%3ESVENSKA NP 9%3C/text%3E%3C/svg%3E") !important;
+            background-repeat: repeat !important;
+            padding: 20px 20px; 
+            border-radius: 8px;
+            border: 1px solid #cbd5e1;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+            text-align: center;
+            position: relative;
+        }
+        
+        .header h1 { 
+            margin: 0 0 12px 0; 
+            font-size: 28px; 
+            font-weight: 800; 
+            color: #2c3e50; 
+            position: relative;
+            z-index: 2;
+        }
+
+        .btn-theme {
+            background: var(--btn-theme-color); 
+            color: white; 
+            border: none; 
+            padding: 8px 18px; 
+            font-size: 13px; 
+            cursor: pointer; 
+            border-radius: 4px; 
+            font-weight: bold;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            position: relative;
+            z-index: 2;
+        }
+        
+        .tabs-nav {
+            display: flex;
+            width: 100%;
+            gap: 50px; 
+            margin-bottom: 0; 
+            padding: 0;
+            box-sizing: border-box;
+            position: relative;
+            z-index: 3;
+        }
+        
+        .tab-btn {
+            flex: 1;
+            background: #e6ecf4;
+            border: 1px solid #cbd5e1;
+            border-bottom: none; 
+            padding: 14px 16px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 14px;
+            color: #64748b;
+            text-align: center;
+            border-radius: 6px 6px 0 0; 
+            transition: all 0.15s ease;
+            box-sizing: border-box;
+            box-shadow: inset 0 -3px 6px rgba(0,0,0,0.05), 0 2px 4px rgba(0,0,0,0.02);
+        }
+        
+        .tab-btn.active {
+            background: white;
+            color: var(--text);
+            border-color: #cbd5e1;
+            z-index: 4;
+            box-shadow: -3px -2px 5px rgba(0,0,0,0.04), 3px -2px 5px rgba(0,0,0,0.04);
+        }
+
+        .content-area { 
+            background: white; 
+            border: 1px solid #cbd5e1; 
+            border-top: none; 
+            padding: 0; 
+            border-radius: 0 0 8px 8px; 
+            flex: 1; 
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            z-index: 2;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+        }
+        
+        .tab-content { 
+            display: none; 
+            flex: 1;
+            flex-direction: column;
+        }
+        .tab-content.active { display: flex; }
+
+        /* Viršutinė eilutė su mygtukais */
+        .tab-utility-row { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            padding: 50px 0 0 0; 
+            border-bottom: none;
+            gap: 20px;
+        }
+        
+        .score-display { font-weight: bold; font-size: 14px; color: var(--text); display: none; }
+        .utility-bar { display: flex; gap: 12px; align-items: center; margin-left: auto; }
+        
+        .text-btn {
+            background: transparent;
+            border: 1px solid transparent;
+            padding: 4px 10px;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 4px;
+            text-transform: uppercase;
+            text-decoration: underline;
+            transition: all 0.15s ease;
+            white-space: nowrap;
+        }
+
+        .btn-main-gen { color: var(--btn-gen-color); }
+        .btn-main-gen:hover:not(:disabled) { border-color: var(--btn-gen-color); text-decoration: none; }
+        .btn-main-gen:disabled { color: #95a5a6; cursor: not-allowed; text-decoration: none; }
+        
+        .btn-info-style { color: var(--btn-info-color); display: none; }
+        .btn-info-style:hover { border-color: var(--btn-info-color); text-decoration: none; }
+        
+        .btn-tips-style { color: var(--btn-tips-color); }
+        .btn-tips-style:hover { border-color: var(--btn-tips-color); text-decoration: none; }
+        
+        .btn-pdf-style { color: var(--btn-pdf-color); }
+        .btn-pdf-style:hover { border-color: var(--btn-pdf-color); text-decoration: none; }
+
+        /* Įrėmintas Skolverket įvadas su tiksliu 20px tarpu nuo mygtukų eilutės */
+        .skolverket-intro {
+            background: #f8fafc;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            padding: 20px 40px;
+            margin: 0px 40px 20px 40px; 
+            line-height: 1.6;
+        }
+        .skolverket-intro p {
+            margin: 0 0 12px 0;
+        }
+        .skolverket-intro p:last-child {
+            margin-bottom: 0;
+        }
+        .skolverket-intro ul {
+            margin: 8px 0 0 0;
+            padding-left: 20px;
+        }
+        .skolverket-intro li {
+            margin-bottom: 4px;
+        }
+        
+        .info-expanded-box {
+            background: #fafbfc; 
+            border: 1px solid #cbd5e1;
+            color: #1e293b;
+            padding: 20px 40px;
+            border-radius: 6px;
+            margin: 20px 40px 0 40px;
+            display: none;
+            line-height: 1.6;
+        }
+        .info-expanded-box h2 { margin-top: 0; font-size: 16px; color: #0f172a; border-bottom: 1px solid #cbd5e1; padding-bottom: 4px; }
+
+        .tips-box { 
+            background: #fffbeb; 
+            border: 1px solid #fde68a; 
+            color: #1e293b; 
+            padding: 20px 40px; 
+            border-radius: 6px; 
+            margin: 20px 40px 0 40px;
+            display: none; 
+            line-height: 1.5; 
+            font-size: 13px; 
+        }
+        .tips-box h4 { margin-top: 0; margin-bottom: 8px; color: #b45309; font-size: 14px; text-transform: uppercase; }
+        .tips-box ul { margin: 0 0 12px 0; padding-left: 20px; }
+        .tips-box li { margin-bottom: 4px; }
+
+        .under-development-box {
+            padding: 20px 40px; 
+            text-align: left; 
+            color: #7f8c8d; 
+            font-style: italic;
+            margin-bottom: 20px;
+        }
+
+        .segment-card { 
+            background: #fff; 
+            border: 1px solid #e2e8f0; 
+            padding: 25px 40px; 
+            margin: 20px 40px 20px 40px; 
+            border-radius: 6px; 
+            border-left: 4px solid var(--muted-gray); 
+        }
+        
+        .segment-card h3 {
+            margin-top: 0;
+            margin-bottom: 12px;
+            font-size: 15px;
+            color: #1e293b;
+            text-transform: uppercase;
+            border-bottom: 1px solid #e2e8f0;
+            padding-bottom: 6px;
+        }
+        
+        .text-title-inline { 
+            font-weight: bold; 
+            color: #2980b9; 
+        }
+        
+        .ai-generated-text { background: var(--gray-bg); border: 1px solid #e2e8f0; padding: 16px; border-radius: 6px; margin: 10px 0; line-height: 1.6; white-space: pre-wrap; font-size: 14px; text-align: justify; }
+        
+        .hl-color-1 { background-color: #ffcccc !important; color: #7a0000; font-weight: 600; padding: 0 4px; border-radius: 3px; border: 1px dashed #ff6666; }
+        .hl-color-2 { background-color: #ffe6cc !important; color: #7a3d00; font-weight: 600; padding: 0 4px; border-radius: 3px; border: 1px dashed #ff9933; }
+        .hl-color-3 { background-color: #ffffcc !important; color: #595900; font-weight: 600; padding: 0 4px; border-radius: 3px; border: 1px dashed #cccc00; }
+        .hl-color-4 { background-color: #e6ffcc !important; color: #2d5900; font-weight: 600; padding: 0 4px; border-radius: 3px; border: 1px dashed #66cc00; }
+        .hl-color-5 { background-color: #ccffff !important; color: #005959; font-weight: 600; padding: 0 4px; border-radius: 3px; border: 1px dashed #33cccc; }
+        .hl-color-6 { background-color: #e6ccff !important; color: #3d007a; font-weight: 600; padding: 0 4px; border-radius: 3px; border: 1px dashed #9933ff; }
+        .hl-color-7 { background-color: #ffd1dc !important; color: #800020; font-weight: 600; padding: 0 4px; border-radius: 3px; border: 1px dashed #ffb6c1; }
+        .hl-color-8 { background-color: #e0b0ff !important; color: #4b0082; font-weight: 600; padding: 0 4px; border-radius: 3px; border: 1px dashed #ba55d3; }
+        .hl-color-9 { background-color: #afeeee !important; color: #008b8b; font-weight: 600; padding: 0 4px; border-radius: 3px; border: 1px dashed #48d1cc; }
+        .hl-color-10 { background-color: #f5f5dc !important; color: #8b8b4d; font-weight: 600; padding: 0 4px; border-radius: 3px; border: 1px dashed #cdcd66; }
+        .hl-color-11 { background-color: #ffdead !important; color: #8b4513; font-weight: 600; padding: 0 4px; border-radius: 3px; border: 1px dashed #cd853f; }
+        .hl-color-12 { background-color: #e6e6fa !important; color: #483d8b; font-weight: 600; padding: 0 4px; border-radius: 3px; border: 1px dashed #7b68ee; }
+
+        .num-analysis-failed { padding: 2px 6px; border-radius: 4px; display: inline-block; font-weight: bold; }
+
+        .question-box { background: #fafbfc; border: 1px solid #e2e8f0; padding: 12px; border-radius: 6px; margin-top: 12px; }
+        .radio-option { display: block; padding: 8px; margin: 6px 0; border: 1px solid #cbd5e1; border-radius: 4px; cursor: pointer; font-size: 13px; }
+        .radio-option.correct { background: #dcfce7 !important; border-color: #22c55e !important; color: #15803d; font-weight: bold; }
+        .radio-option.wrong { background: #fee2e2 !important; border-color: #ef4444 !important; color: #b91c1c; }
+        .radio-option.disabled { opacity: 0.6 !important; cursor: not-allowed; pointer-events: none; }
+
+        .open-input { width: 100%; min-height: 60px; padding: 8px; border: 1px solid #cbd5e1; border-radius: 4px; margin-top: 6px; font-family: inherit; resize: vertical; box-sizing: border-box; font-size: 13px; }
+        .btn-ai-correct { border-radius: 4px; border: none; padding: 6px 12px; font-size: 12px; cursor: pointer; font-weight: bold; }
+        
+        .facit-wrapper { text-align: right; margin: 0 40px 20px 40px; padding-top: 8px; border-top: 1px dashed #cbd5e1; }
+        #facitBtn { background: #e2e8f0; color: #475569; border: 1px solid #cbd5e1; border-radius: 4px; padding: 5px 12px; font-size: 11px; font-weight: bold; cursor: pointer; }
+
+        .ai-evaluation-response { background: #f8fafc; border: 1px solid #cbd5e1; padding: 12px; border-radius: 6px; margin-top: 8px; color: #334155; display: none; font-size: 13px; line-height: 1.5; }
+
+        .footer-author { 
+            text-align: center; font-size: 11px; color: #64748b; margin-top: auto; padding: 12px 0 4px 0; border-top: 1px dashed #cbd5e1;
+        }
+
+        .progress-container { width: 100%; background: #e2e8f0; height: 4px; border-radius: 2px; margin-top: 15px; display: none; overflow: hidden; }
+        #progressFill { height: 100%; background: var(--btn-gen-color); width: 0%; transition: width 0.2s ease; }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <div class="control-bar">
+        <div id="todayDate">--</div>
+        <div id="importantDatesDisplay">
+            NP Läsår 2026/2027: Delprov A (Hösten 2026) | Delprov B (Våren 2027) | Delprov C (Våren 2027)
+        </div>
+        <div id="sessionTimer">00:00</div>
+    </div>
+    
+    <div class="header-main-box">
+        <h1>Svenska Nationella Prov Åk 9</h1>
+        <button id="themeBtn" class="btn-theme" onclick="generateGlobalTheme()">Slumpa ett nytt tema</button>
+        <div id="currentThemeDisplay" style="margin-top: 15px; font-weight: 700; font-size: 15px; color: #2c3e50; position: relative; z-index: 2;">
+            Inget tema valt. Klicka på knappen ovan för att starta.
+        </div>
+        
+        <div id="loader" style="position: relative; z-index: 2; width: 100%;">
+            <div id="pContainer" class="progress-container"><div id="progressFill"></div></div>
+        </div>
+    </div>
+</div>
+
+<div class="tabs-nav">
+    <button id="tabBtn_delprovB" class="tab-btn active" onclick="switchTab('delprovB')">Delprov B: Läsförståelse</button>
+    <button id="tabBtn_delprovA" class="tab-btn" onclick="switchTab('delprovA')">Delprov A: Tala</button>
+    <button id="tabBtn_delprovC" class="tab-btn" onclick="switchTab('delprovC')">Delprov C: Skriva</button>
+</div>
+
+<div class="content-area">
+    
+    <div id="delprovB" class="tab-content active">
+        
+        <div class="tab-utility-row">
+            <div id="scoreDisplayBlock" class="score-display" style="padding-left: 40px;">
+                Total poäng: <span id="totalScoreUI" style="color:var(--primary);">0</span> p
+            </div>
+            <div class="utility-bar" style="padding-right: 40px;">
+                <button id="btnGenB" class="text-btn btn-main-gen" onclick="generateDelprovB()" disabled>Generera delprov B</button>
+                <button id="btnInfoB" class="text-btn btn-info-style" onclick="toggleInfoBlock()">Info</button>
+                <button class="text-btn btn-tips-style" onclick="toggleTips()">Tips</button>
+                <button class="text-btn btn-pdf-style" onclick="window.print()">Pdf</button>
+            </div>
+        </div>
+        
+        <div id="infoExpandedBlock" class="info-expanded-box">
+            <h2>Skolverket Information - Delprov B: läsförståelse</h2>
+            <p>Underlag för delprovet är ett texthäfte innehållande skönlitterär text, sakprosatexter samt dikter och bilder.</p>
+        </div>
+
+        <div id="tipsBox" class="tips-box">
+            <h4>1. Arbetsstrategi (How you do it)</h4>
+            <ul>
+                <li><strong>Skumma först:</strong> Läs snabbt rubriker och första raderna för att förstå helheten.</li>
+                <li><strong>Läs frågorna:</strong> Gå genom frågorna <i>innan</i> du djupläser texten.</li>
+                <li><strong>Markera:</strong> Stryk under nyckelmeningar i texten under läsningen.</li>
+            </ul>
+
+            <h4>2. Slutna frågor (Flervalsfrågor)</h4>
+            <ul>
+                <li><strong>Typ:</strong> Testar specifik fakta eller enkla slutsatser.</li>
+                <li><strong>Strategi:</strong> Eliminera felaktiga svar.</li>
+            </ul>
+
+            <h4>3. Öppna frågor (Textbaserade svar)</h4>
+            <ul>
+                <li><strong>Typ:</strong> Kräver analys, tolkning av dolda budskap eller granskning av språket.</li>
+                <li><strong>Svarsteknik (PEE):</strong> 1. Påstående. 2. Exempel. 3. Förklaring.</li>
+                <li><strong>Poängjakt:</strong> 2-poängsfrågor kräver ett utvecklat svar med minst två olika perspektiv.</li>
+            </ul>
+
+            <h4>4. Nyckelord i frågorna (Examinatorns krav)</h4>
+            <ul>
+                <li><strong>Vad/Vem/Ange (1p):</strong> Svaret står direkt i texten. Skriv kort och exakt.</li>
+                <li><strong>Förklara/Beskriv (1-2p):</strong> Berätta <i>varför</i> eller <i>hur</i> med egna ord.</li>
+                <li><strong>Analysera/Reflektera (2p):</strong> Koppla texten till djupare teman. Kräver ordet "eftersom...".</li>
+            </ul>
+        </div>
+
+        <div id="b_initial_state" class="skolverket-intro">
+            <p>Delprovet genomförs på en gemensam provdag för hela landet och omfattar: <strong>45–60 + 140 minuter</strong>. Det består av 45–60 minuter för enskild genomläsning av ett tillhörande texthäfte och därefter totalt 140 minuter till förfogande för att besvara de konkreta uppgifterna.</p>
+            <p>Delprovet består av uppgifter inom fyra olika läsförståelseprocesser:</p>
+            <ul>
+                <li>Hitta efterfrågad information</li>
+                <li>Dra enkla slutsatser</li>
+                <li>Sammanföra och tolka information och idéer samt reflektera</li>
+                <li>Granska och värdera innehåll, språk och textuella drag</li>
+            </ul>
+        </div>
+
+        <div id="b_dynamic_content"></div>
+    </div>
+
+    <div id="delprovA" class="tab-content"></div>
+
+    <div id="delprovC" class="tab-content"></div>
+
+</div>
+
+<div class="footer-author">
+    &copy; Laura Macioniene | Multi-modul Träningsverktyg NP Svenska
+</div>
+
+<script>
+    let currentGlobalTheme = "";
+    let provDataB = { novell_title: "", novell: "", novell_Q: [], sakprosa_title: "", sakprosa: "", sakprosa_Q: [], compare_Q: [] };
+    let closedAnswersFacit = {}; 
+    let questionAttempts = {}; 
+    let isBGenerated = false;
+    let totalScoreB = 0;
+    let sessionSeconds = 0;
+    let questionsMetadata = {};
+    
+    const apiKey = "FeHQMTgnWcB6yvouwvekliwHjgaazHCUu0M1fC9s";
+
+    document.addEventListener("DOMContentLoaded", () => {
+        const today = new Date();
+        const dateStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+        const dateEl = document.getElementById('todayDate');
+        if (dateEl) dateEl.innerText = dateStr;
+        startSessionTimer(); 
+    });
+
+    function startSessionTimer() {
+        setInterval(() => {
+            sessionSeconds++;
+            const mins = Math.floor(sessionSeconds / 60);
+            const secs = sessionSeconds % 60;
+            const timerEl = document.getElementById('sessionTimer');
+            if (timerEl) {
+                timerEl.innerText = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+            }
+        }, 1000);
+    }
+
+    function switchTab(tabId) {
+        document.querySelectorAll('.tab-content').forEach(c => {
+            c.classList.remove('active');
+            if(c.id !== 'delprovB') c.innerHTML = ''; 
+        });
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        
+        const targetTab = document.getElementById(tabId);
+        const targetBtn = document.getElementById('tabBtn_' + tabId);
+        
+        if (targetTab) {
+            targetTab.classList.add('active');
+            if (tabId === 'delprovA') {
+                targetTab.innerHTML = `<div class="under-development-box">Modul under utveckling. Kommer att innehålla hörförståelseuppgifter kopplade till det valda temat.</div>`;
+            } else if (tabId === 'delprovC') {
+                targetTab.innerHTML = `<div class="under-development-box">Modul under utveckling. Kommer att innehålla skriftliga produktionsuppgifter kopplade till det valda temat.</div>`;
+            }
+        }
+        if (targetBtn) targetBtn.classList.add('active');
+    }
+
+    function toggleTips() { 
+        const box = document.getElementById('tipsBox'); 
+        if(box) box.style.display = box.style.display === 'block' ? 'none' : 'block'; 
+    }
+
+    function toggleInfoBlock() {
+        const block = document.getElementById('infoExpandedBlock');
+        if(block) block.style.display = block.style.display === 'block' ? 'none' : 'block';
+    }
+
+    function formatThemeText(text) {
+        if (!text) return "";
+        let cleaned = text.trim();
+        return cleaned.charAt(0).toUpperCase() + cleaned.slice(1).toLowerCase();
+    }
+
+    async function generateGlobalTheme() {
+        const display = document.getElementById('currentThemeDisplay');
+        const pContainer = document.getElementById('pContainer');
+        const fill = document.getElementById('progressFill');
+        
+        if (pContainer) pContainer.style.display = 'block';
+        if (fill) fill.style.width = '30%';
+
+        const themePrompt = `Välj ut ett slumpmässigt, djupt och engagerande tema för Nationella provet i Svenska åk 9. Svara ENBART med namnet på temat, inga andra ord eller punkter.`;
+
+        try {
+            const chosenTheme = await callCohereAPI(themePrompt);
+            currentGlobalTheme = formatThemeText(chosenTheme);
+            if (display) {
+                display.innerHTML = `<span style="color:var(--btn-gen-color);">TEMA: ${currentGlobalTheme}</span>`;
+            }
+            
+            clearOldBData();
+            const genBtn = document.getElementById('btnGenB');
+            if (genBtn) genBtn.disabled = false;
+
+            if (fill) fill.style.width = '100%';
+            setTimeout(() => { if (pContainer) pContainer.style.display = 'none'; }, 500);
+        } catch (e) {
+            console.warn("Fallback active.");
+            currentGlobalTheme = "Digitaliseringens makt";
+            if (display) {
+                display.innerHTML = `<span style="color:var(--btn-gen-color);">TEMA: ${currentGlobalTheme}</span>`;
+            }
+            
+            clearOldBData();
+            const genBtn = document.getElementById('btnGenB');
+            if (genBtn) genBtn.disabled = false;
+            
+            if (fill) fill.style.width = '100%';
+            setTimeout(() => { if (pContainer) pContainer.style.display = 'none'; }, 500);
+        }
+    }
+
+    function clearOldBData() {
+        isBGenerated = false;
+        provDataB = { novell_title: "", novell: "", novell_Q: [], sakprosa_title: "", sakprosa: "", sakprosa_Q: [], compare_Q: [] };
+        closedAnswersFacit = {};
+        questionAttempts = {};
+        questionsMetadata = {};
+        totalScoreB = 0;
+        
+        const scoreUI = document.getElementById('totalScoreUI');
+        if (scoreUI) scoreUI.innerText = "0";
+        
+        const scoreBlock = document.getElementById('scoreDisplayBlock');
+        if (scoreBlock) scoreBlock.style.display = 'none';
+        
+        const infoBtn = document.getElementById('btnInfoB');
+        if (infoBtn) infoBtn.style.display = 'none';
+
+        const infoBlock = document.getElementById('infoExpandedBlock');
+        if (infoBlock) infoBlock.style.display = 'none';
+
+        const initialState = document.getElementById('b_initial_state');
+        if (initialState) initialState.style.display = 'block';
+        
+        const dynContent = document.getElementById('b_dynamic_content');
+        if (dynContent) dynContent.innerHTML = '';
+    }
+
+    async function generateDelprovB() {
+        if(!currentGlobalTheme) return;
+        
+        const btn = document.getElementById('btnGenB'); 
+        const fill = document.getElementById('progressFill'); 
+        const pContainer = document.getElementById('pContainer'); 
+        
+        if (btn) btn.disabled = true; 
+        if (pContainer) pContainer.style.display = 'block'; 
+        if (fill) fill.style.width = '0%';
+        
+        let currentProgress = 0;
+        const progressInterval = setInterval(() => { 
+            if (currentProgress < 95) { currentProgress += 5; if (fill) fill.style.width = `${currentProgress}%`; } 
+        }, 200);
+
+        const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error("Timeout")), 15000));
+
+        try {
+            const generatorPrompt = `Skapa ett komplett övningsmaterial för Nationella Provet i Svenska för årskurs 9, Delprov B (Läsförståelse) utifrån temat: "${currentGlobalTheme}". Svara enbart med ett rått JSON-objekt enligt följande strikta struktur:
+            {
+              "novell_title": "str",
+              "novell_text": "str",
+              "novell_questions": [{"type": "closed", "question": "str", "options": {"A":"str","B":"str","C":"str","D":"str"}, "correct_option": "A", "text_quote": "str"}, {"type": "open", "question": "str", "text_quote": "str"}],
+              "sakprosa_title": "str",
+              "sakprosa_text": "str",
+              "sakprosa_questions": [{"type": "closed", "question": "str", "options": {"A":"str","B":"str","C":"str","D":"str"}, "correct_option": "A", "text_quote": "str"}],
+              "compare_questions": [{"type": "open", "question": "str", "text_quote": "str"}]
+            }`;
+
+            let responseText = await Promise.race([callCohereAPI(generatorPrompt), timeoutPromise]);
+            
+            const startIdx = responseText.indexOf('{');
+            const endIdx = responseText.lastIndexOf('}');
+            if (startIdx === -1 || endIdx === -1) throw new Error("JSON Parse fail");
+            
+            let jsonString = responseText.substring(startIdx, endIdx + 1);
+            const data = JSON.parse(jsonString);
+
+            loadBData(data);
+            finalizeBGeneration(progressInterval, fill, pContainer, btn);
+
+        } catch (err) {
+            console.warn("Fallback triggered.");
+            loadFallbackBData();
+            finalizeBGeneration(progressInterval, fill, pContainer, btn);
+        }
+    }
+
+    function loadBData(data) {
+        provDataB.novell_title = data.novell_title || "Ett digitalt spår";
+        provDataB.novell = data.novell_text || data.novell || "Hemma i rummet satt Leo framför datorn...";
+        provDataB.sakprosa_title = data.sakprosa_title || "Hur AI förändrar vår skola";
+        provDataB.sakprosa = data.sakprosa_text || data.sakprosa || "Artificiell intelligens (AI) är inte längre framtid...";
+        provDataB.novell_Q = data.novell_questions || [];
+        provDataB.sakprosa_Q = data.sakprosa_questions || [];
+        provDataB.compare_Q = data.compare_questions || [];
+    }
+
+    function loadFallbackBData() {
+        provDataB = {
+            novell_title: "Ett fönster mot igår",
+            novell: "Elias satt ensam i det tysta köket och stirrade på de gamla, bleknade fotografierna som låg utspridda över det slitna träbordet. Varje bild kändes som ett avlägset eko från en tid han knappt mindes längre, men ändå bar med sig djupt inom sig. Doften av nybakt bröd fyllde plötsligt hans sinne som ett starkt minne, precis på samma sätt som den alltid hade gjort när mormor fortfarande levde och fanns där. Det var här i detta rum de hade suttit under sena vinterkvällar, medan radion spelade lågmäld musik i bakgrunden och mormor berättade historier om hur staden såg ut förr i tiden, långt innan de enorma industrikomplexen byggdes upp. Tiden verkade ha stått stilla i just detta hörn av huset, medan världen utanför transformerades i en rasande, nästan skrämmande takt.\n\nHan kände en hård och tung klump i halsen när han motvilligt insåg hur brutalt mycket som faktiskt hade förändrats i hans liv på bara några få, korta år. Långsamt tog han upp bilden på den gamla, ståtliga eken som stolt stått nere vid sjön i generationer – den unika miljö som nu var helt borta för att ge plats åt det nya, opersonliga höghuset i betong. Trädet hade varit en samlingspunkt för ungdomar under somrarna, en plats fylld av skratt, djupa samtal och hemligheter under den varma junisolen. Allt runtomkring honom kändes plötsligt så otroligt främmande, sterilt och kalt. Moderniseringen hade rullat in som en obeveklig ångvält och sopat bort de fysiska spåren av hans barndom, och lämnat honom kvar med ingenting annat än fragmentariska minnen fästa på glansigt papper.\n\nHan mindes hur de brukade springa ner till bryggan barfota, utan en enda tanke på morgondagen eller det vuxenliv som väntade runt hörnet. Mormor stod alltid på verandan och ropade att maten var klar, her röst bar av en villkorslös värme som han aldrig lyckats finna någon annanstans efter hennes bortgång. Nu när han betraktade de tomma ytorna i huset, insåg han att de materiella tingen betydde så lite i jämförelse med de levande ögonblicken som en gång fyllt dem. Fotografierna var inte bara bilder; de var de sista existerande bevisen på att hans lyckliga förflutna inte bara hade varit en vacker dröm.",
+            sakprosa_title: "Stadsplanering och historiska minnen",
+            sakprosa: "När moderna städer växer och expanderar i snabb takt förändras inte bara det synliga fysiska landskapet, utan i hög grad även invånarnas interna mentala kartor. Omfattande sociologisk och miljöpsykologisk forskning visar entydigt att gamla historiska byggnader och etablerade naturmiljöer fungerar som viktiga känslomässiga ankare för människors personliga och kollektiva identitet. När en välkänd miljö plötsligt försvinner, förlorar människor en del av sin historia, vilket direkt påverkar den upplevda tryggheten och kontinuiteten i närområdet.\n\nNär dessa trygga miljöer raderas ut eller transformeras i urbaniseringens och effektivitetens namn, kan det hos individer leda till en djupgående känsla av rotlöshet, alienation och existentiell vilsenhet. Det handlar alltså inte enbart om enkel nostalgi över svunna tider, utan om komplexa psykologiska processer som rör hur människan speglar sin egen existens och stabilitet i de fysiska miljöer hur rör sig i dagligen. Utan dessa fasta referenspunkter i arkitekturen kan samhällsgemenskapen gradvis försvagas.\n\nI Sverige pågår det därför ständiga, intensiva debatter mellan arkitekter, kulturhistoriker och kommunalpolitiker om hur vi bäst bevarar unika kulturmiljöer och äldre stadsdelar samtidigt som vi effektivt bygger för framtidens växande behov och tekniska krav. Att integrera historiska värden i moderna, hållbara stadsbyggnadsprojekt har visat sig vara en av stadsplaneringens absolut största och mest kritiska utmaningar i det moderna välfärdssamhället. Framgångsrika exempel kräver ofta att man lyssnar till medborgarnas egna berättelser och upplevelser av platsen innan de fysiska förändringarna påbörjas.",
+            novell_Q: [
+                { "type": "closed", "question": "Vad doftade det i köket enligt berättelsen?", "options": {"A":"Nyfyllt kaffe","B":"Nybakt bröd","C":"Färska blommor","D":"Mormors gamla parfym"}, "correct_option": "B", "text_quote": "Doften av nybakt bröd" },
+                { "type": "closed", "question": "Vad skulle byggas på den plats där den gamla ståtliga eken tidigare stått?", "options": {"A":"En modern parkeringsplats","B":"En ny regional skola","C":"Det nya höghuset","D":"En allmän park"}, "correct_option": "C", "text_quote": "ge plats åt det nya, opersonliga höghuset" },
+                { "type": "open", "question": "Hur reagerade Elias känslomässigt när han iakttog de gamla fotografierna?", "text_quote": "Han kände en hård och tung klump i halsen" },
+                { "type": "open", "question": "Vad exakt hände med den historiska och naturliga miljön runt sjön?", "text_quote": "den unika miljö som nu var helt borta" }
+            ],
+            sakprosa_Q: [
+                { "type": "closed", "question": "Vad fungerar gamla etablerade miljöer som enligt modern forskning?", "options": {"A":"Ekonomiska belastningar för kommunen","B":"Ankare för människors identitet","C":"Temporära turistattraktioner","D":"Hinder för teknisk modernisering"}, "correct_option": "B", "text_quote": "fungerar som viktiga känslomässiga ankare" },
+                { "type": "open", "question": "Vilken specifik negativ psykologisk känsla kan drabba invånare när välkända kulturmiljöer försvinner?", "text_quote": "leda till en djupgående känsla av rotlöshet" }
+            ],
+            compare_Q: [
+                { "type": "open", "question": "Analysera och förklara hur Elias personliga upplevelse i novellen exemplifierar det vetenskapliga begreppet 'rotlöshet' som beskrivs i sakprosatexten.", "text_quote": "Allt runtomkring honom kändes plötsligt så otroligt främmande" }
+            ]
+        };
+        isBGenerated = true;
+    }
+
+    function finalizeBGeneration(progressInterval, fill, pContainer, btn) {
+        clearInterval(progressInterval); 
+        if (fill) fill.style.width = '100%';
+        isBGenerated = true;
+        
+        const initialState = document.getElementById('b_initial_state');
+        if (initialState) initialState.style.display = 'none';
+
+        renderB();
+        
+        const scoreBlock = document.getElementById('scoreDisplayBlock');
+        if (scoreBlock) scoreBlock.style.display = 'block';
+
+        const infoBtn = document.getElementById('btnInfoB');
+        if (infoBtn) infoBtn.style.display = 'inline-block';
+
+        if (pContainer) pContainer.style.display = 'none'; 
+        if (btn) btn.disabled = false;
+    }
+
+    function renderB() {
+        const container = document.getElementById('b_dynamic_content');
+        if (!container) return;
+        
+        let html = `${buildCleanB()}
+                 <div class="facit-wrapper">
+                    <button id="facitBtn" onclick="alert('Facit: ' + JSON.stringify(closedAnswersFacit))">Visa Facit (Flervalsfrågor)</button>
+                 </div>`;
+        container.innerHTML = html;
+        
+        const scoreUI = document.getElementById('totalScoreUI');
+        if (scoreUI) scoreUI.innerText = totalScoreB;
+    }
+
+    function buildCleanB() {
+        let html = ""; 
+        let qIndex = 1;
+
+        if (provDataB.novell) {
+            html += `<div class="segment-card">
+                        <h3>TEXT 1: SKÖNLITTERATUR (Novell) – <span class="text-title-inline">${provDataB.novell_title}</span></h3>
+                        <div id="textContainer_novell" class="ai-generated-text">${provDataB.novell}</div>`;
+            provDataB.novell_Q.forEach(q => { html += renderCleanQuestion(q, qIndex++, 'novell'); });
+            html += `</div>`;
+        }
+
+        if (provDataB.sakprosa) {
+            html += `<div class="segment-card">
+                        <h3>TEXT 2: SAKPROSA (Faktatext) – <span class="text-title-inline">${provDataB.sakprosa_title}</span></h3>
+                        <div id="textContainer_sakprosa" class="ai-generated-text">${provDataB.sakprosa}</div>`;
+            provDataB.sakprosa_Q.forEach(q => { html += renderCleanQuestion(q, qIndex++, 'sakprosa'); });
+            html += `</div>`;
+        }
+
+        if (provDataB.compare_Q && provDataB.compare_Q.length > 0) {
+            html += `<div class="segment-card" style="border-left-color:#8e44ad;"><h3>DEL 3: JÄMFÖRANDE FRÅGOR</h3>`;
+            provDataB.compare_Q.forEach(q => { html += renderCleanQuestion(q, qIndex++, 'compare'); });
+            html += `</div>`;
+        }
+        return html;
+    }
+
+    function renderCleanQuestion(qObj, num, textType) {
+        if (!qObj || !qObj.question) return "";
+        let qText = qObj.question.trim();
+        let h = `<div class="question-box"><div style="font-weight:bold; margin-bottom:6px;"><span id="qNum_${num}" class="num-initial-style">${num}</span>. ${qText}</div>`;
+        
+        questionsMetadata[num] = {
+            textType: textType,
+            text_quote: qObj.text_quote || "",
+            questionText: qText
+        };
+
+        if (qObj.type === "closed" && qObj.options) {
+            ['A', 'B', 'C', 'D'].forEach(opt => {
+                let optText = qObj.options[opt] ? qObj.options[opt].replace(/\*\*/g, "").trim() : "Alternativ saknas";
+                h += `<label id="lbl_${num}_${opt}" class="radio-option"><input type="radio" name="q_${num}" onclick="handleClosed(${num}, '${opt}')"> ${opt}) ${optText}</label>`;
+            });
+            closedAnswersFacit[num] = qObj.correct_option ? qObj.correct_option.toUpperCase() : "A";
+        } else {
+            h += `<textarea id="in_${num}" class="open-input" placeholder="Skriv ditt textbaserade svar här..."></textarea>
+                  <button id="btn_${num}" class="btn-ai-correct" style="background:var(--muted-gray); color:white; margin-top:6px;" onclick="handleOpenAI(${num})">Rätta med AI</button>
+                  <div id="res_${num}" class="ai-evaluation-response"></div>`;
+        }
+        return h + `</div>`;
+    }
+
+    function applyPermanentHighlight(num) {
+        const meta = questionsMetadata[num];
+        if (!meta || !meta.text_quote) return;
+
+        let containerId = meta.textType === 'novell' ? "textContainer_novell" : (meta.textType === 'sakprosa' ? "textContainer_sakprosa" : "");
+        const container = document.getElementById(containerId);
+        if (!container) return;
+
+        let quote = meta.text_quote.trim();
+        let originalText = container.innerHTML;
+
+        let colorIndex = ((num - 1) % 12) + 1;
+        let colorClass = `hl-color-${colorIndex}`;
+
+        if (quote && originalText.includes(quote)) {
+            let escapedQuote = quote.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+            let regex = new RegExp(escapedQuote, 'g');
+            
+            if (!originalText.includes(`title="Svaret för fråga ${num}"`)) {
+                container.innerHTML = originalText.replace(regex, `<span class="${colorClass}" title="Svaret för fråga ${num}">${quote}</span>`);
+            }
+        }
+        
+        const numLabel = document.getElementById(`qNum_${num}`);
+        if(numLabel) {
+            numLabel.className = `num-analysis-failed ${colorClass}`;
+        }
+    }
+
+    function handleClosed(qNum, selected) {
+        if (!questionAttempts[qNum]) questionAttempts[qNum] = 0;
+        if (questionAttempts[qNum] >= 2) return;
+        
+        questionAttempts[qNum]++;
+        const correct = closedAnswersFacit[qNum];
+        const label = document.getElementById(`lbl_${qNum}_${selected}`);
+        
+        if (questionAttempts[qNum] === 1) {
+            if (selected === correct) { 
+                if (label) label.classList.add('correct'); 
+                updateScore(1); 
+                lockClosed(qNum); 
+            } else { 
+                if (label) label.classList.add('wrong'); 
+            }
+        } else if (questionAttempts[qNum] >= 2) {
+            if (selected === correct) { 
+                if (label) label.classList.add('correct'); 
+                updateScore(1);
+            } else { 
+                if (label) label.classList.add('wrong'); 
+                applyPermanentHighlight(qNum); 
+            }
+            lockClosed(qNum);
+        }
+    }
+
+    function lockClosed(qNum) { 
+        document.querySelectorAll(`input[name="q_${qNum}"]`).forEach(i => { 
+            i.disabled = true; 
+            i.parentElement.classList.add('disabled'); 
+        }); 
+        questionAttempts[qNum] = 2; 
+    }
+
+    async function handleOpenAI(qId) {
+        const btn = document.getElementById(`btn_${qId}`); 
+        const input = document.getElementById(`in_${qId}`); 
+        const resBox = document.getElementById(`res_${qId}`); 
+        const text = input.value.trim(); 
+        if (!text) return;
+        
+        btn.disabled = true; 
+        btn.innerText = "...";
+        resBox.style.display = "block";
+        resBox.innerHTML = "<i>Analyserar...</i>";
+
+        const cleanLower = text.toLowerCase().replace(/[^a-zåäö]/g, "");
+        if (cleanLower === "nezino" || cleanLower === "vetinte" || cleanLower === "vetej" || text.length < 3) {
+            input.disabled = true; 
+            btn.style.display = "none";
+            resBox.innerHTML = `<div style="background:#e2e8f0; padding:6px 10px; border-radius:4px; font-weight:bold; margin-bottom:10px; display:inline-block; color:#b91c1c;">Poäng: 0 / 2 p</div><br>**Vad som är fel/Vad som saknas:** Inget svar angavs eller svaret indikerar att eleven inte vet.<br>**Korrekt svar enligt texten:** Se markerad text i dokumentet.`;
+            applyPermanentHighlight(qId);
+            return;
+        }
+
+        const meta = questionsMetadata[qId];
+        let contextText = meta.textType === 'novell' ? provDataB.novell : (meta.textType === 'sakprosa' ? provDataB.sakprosa : provDataB.novell + "\n\n" + provDataB.sakprosa);
+
+        const evalPrompt = `Du är en strikt svensk examinator för Nationella provet i Svenska åk 9.
+Rätta följande svar på frågan: "${meta.questionText}" baserat på texten: "${contextText}".
+Elevens svar: "${text}"
+
+Följ exakt denna struktur i din respons:
+**Vad som är fel/Vad som saknas:** [Här förklarar du tydligt bristerna i svaret]
+**Korrekt svar enligt texten:** [Här ger du ett perfekt exempelsvar]
+[POINTS:X] (Där X är 0, 1 eller 2 baserat på kvalité. Inga decimaler. Om svaret är helt irrelevant eller felaktigt, ge 0 poäng.)`;
+
+        try {
+            const aiFeedback = await callCohereAPI(evalPrompt);
+            let points = 0; 
+            const match = aiFeedback.match(/\[POINTS:([0-2])\]/); 
+            if (match) points = parseInt(match[1]);
+            
+            updateScore(points); 
+            input.disabled = true; 
+            btn.style.display = "none";
+            
+            let cleanFeedback = aiFeedback.replace(/\[POINTS:[0-2]\]/g, '').trim().replace(/\n/g, '<br>');
+            resBox.innerHTML = `<div style="background:#e2e8f0; padding:6px 10px; border-radius:4px; font-weight:bold; margin-bottom:10px; display:inline-block;">Poäng: ${points} / 2 p</div><br>${cleanFeedback}`;
+
+            if (points < 2) {
+                applyPermanentHighlight(qId);
+            }
+        } catch(e) { 
+            updateScore(0);
+            input.disabled = true;
+            btn.style.display = "none";
+            resBox.innerHTML = `<div style="background:#e2e8f0; padding:6px 10px; border-radius:4px; font-weight:bold; margin-bottom:10px; display:inline-block; color:#b91c1c;">Poäng: 0 / 2 p</div><br>**Vad som är fel/Vad som saknas:** Systemfel eller ogiltigt svar.<br>**Korrekt svar enligt texten:** Analysera textstycket för att hitta sammanhanget.`;
+            applyPermanentHighlight(qId);
+        }
+    }
+
+    async function callCohereAPI(promptText) {
+        const response = await fetch("https://api.cohere.com/v1/generate", {
+            method: 'POST',
+            headers: { 
+                'Authorization': `Bearer ${apiKey}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                model: 'command-r-plus',
+                prompt: promptText,
+                max_tokens: 1500,
+                temperature: 0.2 
+            })
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.message || "API-Error");
+        
+        if (data.generations && data.generations.length > 0) {
+            return data.generations[0].text;
+        }
+        return data.text || "";
+    }
+
+    function updateScore(p) { 
+        totalScoreB += p; 
+        const scoreUI = document.getElementById('totalScoreUI');
+        if (scoreUI) scoreUI.innerText = totalScoreB;
+    }
+</script>
+</body>
+</html>
